@@ -8,6 +8,16 @@
 
 #include <iostream>
 
+
+#include <imgui.h>
+#include <imgui-SFML.h>
+
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+
+
 static constexpr auto USAGE =
   R"(Naval Fate.
 
@@ -26,20 +36,50 @@ static constexpr auto USAGE =
           --drifting    Drifting mine.
 )";
 
-int main(int argc, const char **argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
 {
-  std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
-    { std::next(argv), std::next(argv, argc) },
-    true,// show help if requested
-    "Naval Fate 2.0");// version string
-
-  for (auto const &arg : args) {
-    std::cout << arg.first << arg.second << std::endl;
-  }
-
+//  std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
+//    { std::next(argv), std::next(argv, argc) },
+//    true,// show help if requested
+//    "Naval Fate 2.0");// version string
+//
+//  for (auto const &arg : args) {
+//    std::cout << arg.first << arg.second << std::endl;
+//  }
 
   //Use the default logger (stdout, multi-threaded, colored)
-  spdlog::info("Hello, {}!", "World");
+  spdlog::info("Staring ImGui + SFML");
 
-  fmt::print("Hello, from {}\n", "{fmt}");
+  sf::RenderWindow window(sf::VideoMode(640, 480), "ImGui + SFML = <3");
+  window.setFramerateLimit(60);
+  ImGui::SFML::Init(window);
+
+  sf::CircleShape shape(100.f);
+  shape.setFillColor(sf::Color::Green);
+
+  sf::Clock deltaClock;
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      ImGui::SFML::ProcessEvent(event);
+
+      if (event.type == sf::Event::Closed) {
+        window.close();
+      }
+    }
+
+    ImGui::SFML::Update(window, deltaClock.restart());
+
+    ImGui::Begin("Hello, world!");
+    ImGui::Button("Look at this pretty button");
+    ImGui::End();
+
+    window.clear();
+    window.draw(shape);
+    ImGui::SFML::Render(window);
+    window.display();
+  }
+
+  ImGui::SFML::Shutdown();
+  return 0;
 }
