@@ -50,12 +50,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
   //Use the default logger (stdout, multi-threaded, colored)
   spdlog::info("Staring ImGui + SFML");
 
-  sf::RenderWindow window(sf::VideoMode(640, 480), "ImGui + SFML = <3");
+  sf::RenderWindow window(sf::VideoMode(1024, 768), "ImGui + SFML = <3");
   window.setFramerateLimit(60);
   ImGui::SFML::Init(window);
 
-  sf::CircleShape shape(100.f);
-  shape.setFillColor(sf::Color::Green);
+  constexpr auto scale_factor = 2.0;
+  ImGui::GetStyle().ScaleAllSizes(scale_factor);
+  ImGui::GetIO().FontGlobalScale = scale_factor;
+
+  bool state[11] = { false, };
 
   sf::Clock deltaClock;
   while (window.isOpen()) {
@@ -70,12 +73,21 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
 
     ImGui::SFML::Update(window, deltaClock.restart());
 
-    ImGui::Begin("Hello, world!");
-    ImGui::Button("Look at this pretty button");
+    ImGui::Begin("The Plan");
+    ImGui::Checkbox("0: The Plan", &state[0]);
+    ImGui::Checkbox("1: Getting Started", &state[1]);
+    ImGui::Checkbox("2: C++ 20 So Far", &state[2]);
+    ImGui::Checkbox("3: Reading SFML Input States", &state[3]);
+    ImGui::Checkbox("4: Managing Game State", &state[4]);
+    ImGui::Checkbox("5: Making Our Game Testable", &state[5]);
+    ImGui::Checkbox("6: Making Game State Allocator Aware", &state[6]);
+    ImGui::Checkbox("7: Add Logging To Game Engine", &state[7]);
+    ImGui::Checkbox("8: Draw a Game map", &state[8]);
+    ImGui::Checkbox("9: Dialog Trees", &state[9]);
+    ImGui::Checkbox("10: Porting From SFML To SDL", &state[10]);
     ImGui::End();
 
     window.clear();
-    window.draw(shape);
     ImGui::SFML::Render(window);
     window.display();
   }
