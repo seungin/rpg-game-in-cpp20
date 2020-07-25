@@ -38,14 +38,16 @@ static constexpr auto USAGE =
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
 {
-//  std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
-//    { std::next(argv), std::next(argv, argc) },
-//    true,// show help if requested
-//    "Naval Fate 2.0");// version string
-//
-//  for (auto const &arg : args) {
-//    std::cout << arg.first << arg.second << std::endl;
-//  }
+  //  std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
+  //    { std::next(argv), std::next(argv, argc) },
+  //    true,// show help if requested
+  //    "Naval Fate 2.0");// version string
+  //
+  //  for (auto const &arg : args) {
+  //    std::cout << arg.first << arg.second << std::endl;
+  //  }
+
+  spdlog::debug(USAGE);
 
   //Use the default logger (stdout, multi-threaded, colored)
   spdlog::info("Staring ImGui + SFML");
@@ -58,7 +60,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
   ImGui::GetStyle().ScaleAllSizes(scale_factor);
   ImGui::GetIO().FontGlobalScale = scale_factor;
 
-  bool state[11] = { false, };
+  constexpr std::array steps = {
+    "The Plan",
+    "Getting Started",
+    "Finding Errors As Soon As Possible",
+    "C++ 20 So Far",
+    "Reading SFML Input States",
+    "Managing Game State",
+    "Making Our Game Testable",
+    "Making Game State Allocator Aware",
+    "Add Logging To Game Engine",
+    "Draw a Game map",
+    "Dialog Trees",
+    "Porting From SFML To SDL",
+  };
+
+  std::array<bool, steps.size()> states{};
 
   sf::Clock deltaClock;
   while (window.isOpen()) {
@@ -74,17 +91,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv)
     ImGui::SFML::Update(window, deltaClock.restart());
 
     ImGui::Begin("The Plan");
-    ImGui::Checkbox("0: The Plan", &state[0]);
-    ImGui::Checkbox("1: Getting Started", &state[1]);
-    ImGui::Checkbox("2: C++ 20 So Far", &state[2]);
-    ImGui::Checkbox("3: Reading SFML Input States", &state[3]);
-    ImGui::Checkbox("4: Managing Game State", &state[4]);
-    ImGui::Checkbox("5: Making Our Game Testable", &state[5]);
-    ImGui::Checkbox("6: Making Game State Allocator Aware", &state[6]);
-    ImGui::Checkbox("7: Add Logging To Game Engine", &state[7]);
-    ImGui::Checkbox("8: Draw a Game map", &state[8]);
-    ImGui::Checkbox("9: Dialog Trees", &state[9]);
-    ImGui::Checkbox("10: Porting From SFML To SDL", &state[10]);
+
+    for (std::size_t index = 0; const auto &step : steps) {
+      ImGui::Checkbox(fmt::format("{} : {}", index, step).c_str(), &states.at(index++));
+    }
+
     ImGui::End();
 
     window.clear();
